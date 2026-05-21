@@ -1,27 +1,15 @@
 import { Controller, Get, UseGuards } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 import { AdminJwtGuard } from 'src/auth/guards/admin-jwt.guard';
-import { Product } from 'src/products/product.entity';
+import { DashboardService } from './dashboard.service';
 
 @Controller('admin/dashboard')
 @UseGuards(AdminJwtGuard)
 export class AdminDashboardController {
-  constructor(
-    @InjectRepository(Product) private productRepo: Repository<Product>,
-  ) {}
+  constructor(private readonly dashboardService: DashboardService) {}
 
   @Get('stats')
-  async getStats() {
-    const totalProducts = await this.productRepo.count();
-
-    return {
-      totalUsers: Math.floor(Math.random() * 5000) + 10000,
-      totalStock: totalProducts,
-      salesTrend: 12.5,
-      ordersTrend: 5.2,
-      usersTrend: -2.1,
-    };
+  getStats() {
+    return this.dashboardService.getDashboardStats();
   }
 
   @Get('sales-chart')

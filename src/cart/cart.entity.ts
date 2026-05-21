@@ -8,7 +8,7 @@ import {
   UpdateDateColumn,
   JoinColumn,
 } from 'typeorm';
-import { Product } from '../products/product.entity';
+import { Composant } from '../composants/composants.entity';
 import { User } from 'src/user/user.entity';
 
 export type CartStatus = 'active' | 'checked_out' | 'abandoned' | 'waiting';
@@ -56,9 +56,9 @@ export class CartItem {
   @JoinColumn({ name: 'cart_id' })
   cart: Cart;
 
-  @ManyToOne(() => Product, { eager: true, onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'product_id' })
-  product: Product;
+  @ManyToOne(() => Composant, { eager: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'composant_id' })
+  composant: Composant;
 
   @Column('int', { default: 1 })
   quantity: number;

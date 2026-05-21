@@ -1,5 +1,5 @@
 /**
- * HWstore — Product Entity (PostgreSQL / TypeORM)
+ * HWstore — Composant Entity (PostgreSQL / TypeORM)
  */
 
 import { SubCategory } from 'src/sub-category/sub-category.entity';
@@ -12,8 +12,19 @@ import {
   UpdateDateColumn,
 } from 'typeorm';
 
-@Entity('products')
-export class Product {
+export type ComposantType =
+  | 'boitier'
+  | 'processeur'
+  | 'carte-mere'
+  | 'ram'
+  | 'stockage'
+  | 'gpu'
+  | 'alimentation'
+  | 'refroidissement'
+  | 'other';
+
+@Entity('composants')
+export class Composant {
   @PrimaryGeneratedColumn()
   id: number;
 
@@ -26,7 +37,7 @@ export class Product {
   @Column({ length: 100 })
   brand: string;
 
-  @ManyToOne(() => SubCategory, (subcategory) => subcategory.products, {
+  @ManyToOne(() => SubCategory, (subcategory) => subcategory.composants, {
     cascade: true,
   })
   subcategory: number;
@@ -40,17 +51,28 @@ export class Product {
   @Column('text', { array: true, default: () => 'ARRAY[]::text[]' })
   images: string[];
 
-  @Column({ nullable: true, length: 20 })
-  badge: string;
+  @Column({
+    type: 'enum',
+    enum: [
+      'boitier',
+      'processeur',
+      'carte-mere',
+      'ram',
+      'stockage',
+      'gpu',
+      'alimentation',
+      'refroidissement',
+      'other',
+    ],
+    default: 'other',
+  })
+  type: ComposantType;
 
   @Column('text', { nullable: true })
   description: string;
 
-  @Column('text', { nullable: true })
-  shortDescription: string;
-
   @Column('jsonb', { default: {} })
-  specs: Record<string, string | number>;
+  specs: Record<string, any>;
 
   @Column({ type: 'jsonb', default: {} })
   tags: Record<string, string[]>;

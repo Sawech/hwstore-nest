@@ -8,16 +8,15 @@ import { AdminJwtGuard } from '../auth/guards/admin-jwt.guard';
 import { UserAuthService } from '../auth/user-auth.service';
 import { UserJwtGuard } from '../auth/guards/user-jwt.guard';
 
-import { Product } from '../products/product.entity';
+import { Composant } from '../composants/composants.entity';
 import { User } from '../user/user.entity';
 
-import { AdminDashboardController } from 'src/dashboard/admin-dashboard.controller';
 import { AdminAuthController } from './admin-auth.controller';
 import { UserAuthController } from './user-auth.controller';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Product, User]),
+    TypeOrmModule.forFeature([Composant, User]),
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -30,7 +29,7 @@ import { UserAuthController } from './user-auth.controller';
       }),
     }),
   ],
-  controllers: [AdminAuthController, AdminDashboardController, UserAuthController],
+  controllers: [AdminAuthController, UserAuthController],
   providers: [AdminAuthService, AdminJwtGuard, UserAuthService, UserJwtGuard],
   exports: [AdminAuthService, AdminJwtGuard, UserAuthService, UserJwtGuard],
 })

@@ -1,6 +1,5 @@
 /**
  * HWstore — Category Module
- * Importe Product pour permettre les requêtes de produits par catégorie.
  */
 
 import { Module } from '@nestjs/common';

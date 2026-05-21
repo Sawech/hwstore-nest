@@ -1,10 +1,11 @@
 /**
- * HWstore — Get Products Query DTO
+ * HWstore — Get Composants Query DTO
  */
 
 import { Transform, Type } from 'class-transformer';
 import {
   IsArray,
+  IsEnum,
   IsIn,
   IsNumber,
   IsObject,
@@ -14,7 +15,7 @@ import {
   Min,
 } from 'class-validator';
 
-export class ProductsDto {
+export class ComposantsDto {
   @IsOptional()
   @Type(() => Number)
   @IsNumber()
@@ -72,9 +73,23 @@ export class ProductsDto {
   @IsOptional()
   @IsIn(['ASC', 'DESC'])
   order?: 'ASC' | 'DESC' = 'DESC';
+
+  @IsOptional()
+  @IsEnum([
+    'boitier',
+    'processeur',
+    'carte-mere',
+    'ram',
+    'stockage',
+    'gpu',
+    'alimentation',
+    'refroidissement',
+    'other',
+  ])
+  type?: string;
 }
 
-export class AdminProductDto {
+export class AdminComposantDto {
   @IsOptional()
   @IsString()
   search?: string;
@@ -100,9 +115,23 @@ export class AdminProductDto {
   @IsOptional()
   @IsString()
   order?: 'ASC' | 'DESC';
+
+  @IsOptional()
+  @IsEnum([
+    'boitier',
+    'processeur',
+    'carte-mere',
+    'ram',
+    'stockage',
+    'gpu',
+    'alimentation',
+    'refroidissement',
+    'other',
+  ])
+  type?: string;
 }
 
-export class AdminCreateProductDto {
+export class AdminCreateComposantDto {
   @IsString()
   name: string;
 
@@ -125,10 +154,6 @@ export class AdminCreateProductDto {
   description?: string;
 
   @IsOptional()
-  @IsString()
-  shortDescription?: string;
-
-  @IsOptional()
   @IsArray()
   images?: string[];
 
@@ -145,11 +170,21 @@ export class AdminCreateProductDto {
   stock?: number;
 
   @IsOptional()
-  @IsString()
-  badge?: string;
+  @IsEnum([
+    'boitier',
+    'processeur',
+    'carte-mere',
+    'ram',
+    'stockage',
+    'gpu',
+    'alimentation',
+    'refroidissement',
+    'other',
+  ])
+  type?: string;
 }
 
-export class AdminUpdateProductDto {
+export class AdminUpdateComposantDto {
   @IsOptional()
   @IsString()
   name?: string;
@@ -192,6 +227,16 @@ export class AdminUpdateProductDto {
   stock?: number;
 
   @IsOptional()
-  @IsString()
-  badge?: string;
+  @IsEnum([
+    'boitier',
+    'processeur',
+    'carte-mere',
+    'ram',
+    'stockage',
+    'gpu',
+    'alimentation',
+    'refroidissement',
+    'other',
+  ])
+  type?: string;
 }

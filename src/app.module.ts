@@ -1,19 +1,21 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { ProductsModule } from './products/products.module';
+import { ComposantsModule } from './composants/composants.module';
 import { CategoryModule } from './category/category.module';
 import { SubCategoryModule } from './sub-category/sub-category.module';
-import { ConfiguratorModule } from './configurator/configurator.module';
+
+import { BuilderModule } from './builder/builder.module';
 import { CartModule } from './cart/cart.module';
-import { Product } from './products/product.entity';
+import { Composant } from './composants/composants.entity';
 import { Category } from './category/category.entity';
 import { SubCategory } from './sub-category/sub-category.entity';
-import { ConfiguratorComponent } from './configurator/configurator-component.entity';
+
 import { User } from './user/user.entity';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { Cart, CartItem } from './cart/cart.entity';
+import { DashboardModule } from './dashboard/dashboard.module';
 // import { DatabaseSeederService } from './database/database-seeder.service';
 
 @Module({
@@ -36,10 +38,9 @@ import { Cart, CartItem } from './cart/cart.entity';
         entities: [
           Cart,
           CartItem,
-          Product,
+          Composant,
           Category,
           SubCategory,
-          ConfiguratorComponent,
           User,
         ],
         synchronize: config.get<boolean>('DB_SYNCHRONIZE', true),
@@ -49,20 +50,21 @@ import { Cart, CartItem } from './cart/cart.entity';
       }),
     }),
 
-    ProductsModule,
+    ComposantsModule,
     CategoryModule,
     SubCategoryModule,
-    ConfiguratorModule,
+
+    BuilderModule,
+    DashboardModule,
     CartModule,
     AuthModule,
 
     TypeOrmModule.forFeature([
       Cart,
       CartItem,
-      Product,
+      Composant,
       Category,
       SubCategory,
-      ConfiguratorComponent,
     ]),
   ],
   providers: [AppService],

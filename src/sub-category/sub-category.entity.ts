@@ -1,5 +1,5 @@
 import { Category } from 'src/category/category.entity';
-import { Product } from 'src/products/product.entity';
+import { Composant } from 'src/composants/composants.entity';
 import {
   Column,
   Entity,
@@ -33,6 +33,6 @@ export class SubCategory {
   })
   category: Category;
 
-  @OneToMany(() => Product, (product) => product.subcategory)
-  products: number[];
+  @OneToMany(() => Composant, (composant) => composant.subcategory)
+  composants: number[];
 }

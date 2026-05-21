@@ -17,7 +17,7 @@ import { AdminCartDto, UpdateCartStatusDto } from './dto/cart.dto';
 export class AdminCartController {
   constructor(private readonly cartService: CartService) {}
   @Get()
-  findAll(@Query() query: AdminCartDto) {
+  adminFindAll(@Query() query: AdminCartDto) {
     return this.cartService.adminFindAll(query);
   }
   @Patch(':id/status')

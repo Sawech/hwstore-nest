@@ -35,7 +35,7 @@ export class CartService {
 
     let carts = await this.cartRepo.find({
       where,
-      relations: ['items', 'items.product'],
+      relations: ['items', 'items.composant'],
     });
 
     if (!carts) {
@@ -70,7 +70,7 @@ export class CartService {
 
     if (search) {
       qb.andWhere(
-        '(user.firstName ILIKE :search OR user.lastName ILIKE :search OR user.email ILIKE :search)',
+        '(user.firstName ILIKE :search OR user.lastName ILIKE :search OR user.email ILIKE :search OR cart.orderRef ILIKE :search)',
         { search: `%${search}%` },
       );
     }
@@ -124,11 +124,11 @@ export class CartService {
   //     await this.cartRepo.save(userCart);
   //   }
 
-  //   // Merge items — if same product+variant exists, add quantities
+  //   // Merge items — if same composant+variant exists, add quantities
   //   for (const guestItem of guestCart.items) {
   //     const existing = userCart.items.find(
   //       (i) =>
-  //         i.product.id === guestItem.product.id &&
+  //         i.composant.id === guestItem.composant.id &&
   //         i.variant === guestItem.variant,
   //     );
   //     if (existing) {
@@ -195,14 +195,13 @@ export class CartService {
         orderRef,
         ...(userId ? { user: { id: userId } } : {}),
         items: items.map((i: any) => ({
-          product: { id: i.productId },
+          composant: { id: i.composantId },
           quantity: i.quantity,
           unitPrice: i.unitPrice,
         })),
       });
 
       await this.cartRepo.save(cart);
-      console.log('Order saved for checkout:', checkout.id);
     } else if (event.type === 'checkout.failed') {
     }
 
@@ -229,7 +228,7 @@ export class CartService {
     const [carts, total] = await this.cartRepo
       .createQueryBuilder('cart')
       .leftJoinAndSelect('cart.items', 'item')
-      .leftJoinAndSelect('item.product', 'product')
+      .leftJoinAndSelect('item.composant', 'composant')
       .where('cart.user_id = :userId', { userId })
       .orderBy('cart.createdAt', 'DESC')
       .skip(skip)
