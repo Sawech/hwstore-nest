@@ -9,10 +9,19 @@ async function bootstrap() {
   app.setGlobalPrefix('api');
 
   app.enableCors({
-    origin: ['http://localhost:4200', 'http://localhost:4000'],
+    origin: [
+      'http://localhost:4200',
+      'http://localhost:4000',
+      'https://hwstoree.netlify.app',
+    ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,
-    allowedHeaders: ['Content-Type', 'Authorization', 'x-session-token', 'ngrok-skip-browser-warning'],
+    allowedHeaders: [
+      'Content-Type',
+      'Authorization',
+      'x-session-token',
+      'ngrok-skip-browser-warning',
+    ],
   });
 
   app.use(
