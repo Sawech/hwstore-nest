@@ -131,30 +131,10 @@ export class CartService {
   }
 
   async updateStatus(id: number, dto: UpdateCartStatusDto) {
-    const cart = await this.cartRepo.findOne({
-      where: { id },
-      relations: ['user'],
-    });
+    const cart = await this.cartRepo.findOne({ where: { id } }); // missing await
     if (!cart) throw new NotFoundException(`Cart #${id} not found`);
-
     cart.status = dto.status as CartStatus;
-    const saved = await this.cartRepo.save(cart);
-
-    if (cart.user?.email) {
-      console.log('cart update');
-      await this.mailService
-        .sendStatusUpdate({
-          userEmail: cart.user.email,
-          userName: `${cart.user.firstName} ${cart.user.lastName}`,
-          orderRef: cart.orderRef,
-          status: dto.status as CartStatus,
-        })
-        .catch((err) => {
-          console.log('err', err);
-        }); // don't fail the request if mail fails
-    }
-
-    return saved;
+    return this.cartRepo.save(cart);
   }
 
   // async mergeGuestCart(sessionToken: string, userId: number) {
