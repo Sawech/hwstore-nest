@@ -15,7 +15,6 @@ import {
   UpdateCartStatusDto,
 } from './dto/cart.dto';
 import { CartStatus } from './cart.entity';
-import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class CartService {
@@ -24,7 +23,6 @@ export class CartService {
   constructor(
     @InjectRepository(Cart)
     private readonly cartRepo: Repository<Cart>,
-    private readonly mailService: MailService,
   ) {
     const key = process.env.CHARGILY_SECRET_KEY;
     if (!key) throw new Error('CHARGILY_SECRET_KEY is not set');
