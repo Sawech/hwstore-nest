@@ -13,6 +13,7 @@ async function bootstrap() {
       'http://localhost:4200',
       'http://localhost:4000',
       'https://hwstoree.netlify.app',
+      'https://hwst.netlify.app',
     ],
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS',
     credentials: true,

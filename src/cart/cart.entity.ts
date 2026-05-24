@@ -25,7 +25,7 @@ export class Cart {
   // @Column({ nullable: true, name: 'session_token', length: 128 })
   // sessionToken?: string;
   @Column({ nullable: true, unique: true, name: 'order_ref', length: 20 })
-  orderRef?: string;
+  orderRef: string;
 
   @Column({
     type: 'enum',

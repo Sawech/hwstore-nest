@@ -1,12 +1,9 @@
 import {
   Injectable,
-  BadRequestException,
-  ForbiddenException,
   NotFoundException,
   HttpStatus,
   HttpException,
 } from '@nestjs/common';
-import * as crypto from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Cart } from './cart.entity';
@@ -18,6 +15,7 @@ import {
   UpdateCartStatusDto,
 } from './dto/cart.dto';
 import { CartStatus } from './cart.entity';
+import { MailService } from '../mail/mail.service';
 
 @Injectable()
 export class CartService {
@@ -26,6 +24,7 @@ export class CartService {
   constructor(
     @InjectRepository(Cart)
     private readonly cartRepo: Repository<Cart>,
+    private readonly mailService: MailService,
   ) {
     const key = process.env.CHARGILY_SECRET_KEY;
     if (!key) throw new Error('CHARGILY_SECRET_KEY is not set');
@@ -132,10 +131,30 @@ export class CartService {
   }
 
   async updateStatus(id: number, dto: UpdateCartStatusDto) {
-    const cart = await this.cartRepo.findOne({ where: { id } }); // missing await
+    const cart = await this.cartRepo.findOne({
+      where: { id },
+      relations: ['user'],
+    });
     if (!cart) throw new NotFoundException(`Cart #${id} not found`);
+
     cart.status = dto.status as CartStatus;
-    return this.cartRepo.save(cart);
+    const saved = await this.cartRepo.save(cart);
+
+    if (cart.user?.email) {
+      console.log('cart update');
+      await this.mailService
+        .sendStatusUpdate({
+          userEmail: cart.user.email,
+          userName: `${cart.user.firstName} ${cart.user.lastName}`,
+          orderRef: cart.orderRef,
+          status: dto.status as CartStatus,
+        })
+        .catch((err) => {
+          console.log('err', err);
+        }); // don't fail the request if mail fails
+    }
+
+    return saved;
   }
 
   // async mergeGuestCart(sessionToken: string, userId: number) {
