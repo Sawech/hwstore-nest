@@ -21,6 +21,7 @@ import { CpuMotherboardValidator }  from './compatibility/validators/cpu-motherb
 import { RamMotherboardValidator }  from './compatibility/validators/ram-motherboard.validator';
 import { GpuCaseValidator }         from './compatibility/validators/gpu-case.validator';
 import { PsuSystemValidator }       from './compatibility/validators/psu-system.validator';
+import { PsuCaseValidator }         from './compatibility/validators/psu-case.validator';
 import { CoolerCpuValidator }       from './compatibility/validators/cooler-cpu.validator';
 import { MotherboardCaseValidator } from './compatibility/validators/motherboard-case.validator';
 
@@ -49,6 +50,7 @@ import { RamScorer } from './recommendation/scorers/ram.scorer';
     RamMotherboardValidator,
     GpuCaseValidator,
     PsuSystemValidator,
+    PsuCaseValidator,
     CoolerCpuValidator,
     MotherboardCaseValidator,
     // Scorers

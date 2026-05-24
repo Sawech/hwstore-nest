@@ -16,7 +16,7 @@ import {
 import type { RawBodyRequest } from '@nestjs/common';
 import { Request } from 'express';
 import { CartService } from './cart.service';
-import { CartContextDto } from './dto/cart.dto';
+import { CartContextDto, CartDto } from './dto/cart.dto';
 import { UserJwtGuard } from '../auth/guards/user-jwt.guard';
 
 @Controller('cart')
@@ -38,43 +38,53 @@ export class CartController {
   @Get('orders')
   @UseGuards(UserJwtGuard)
   getUserCarts(
-    @Req() req: any,
+    @Query('userId', ParseIntPipe) userId: number,
     @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number,
     @Query('limit', new DefaultValuePipe(8), ParseIntPipe) limit: number,
   ) {
-    return this.cartService.getUserCarts(req.user.sub, page, limit);
+    return this.cartService.getUserCarts(userId, page, limit);
   }
 
-  @Get('bill/:checkoutId')
-  getBill(@Param('checkoutId') checkoutId: string) {
-    return this.cartService.getBill(checkoutId);
+  @Get(':id')
+  getCartById(@Param('id') id: number) {
+    return this.cartService.findOne(id);
   }
 
-  @Get(':checkoutId')
-  getOrderByCheckoutId(@Param('checkoutId') checkoutId: string) {
-    return this.cartService.getOrderByCheckoutId(checkoutId);
+  // @Get('bill/:checkoutId')
+  // getBill(@Param('checkoutId') checkoutId: string) {
+  //   return this.cartService.getBill(checkoutId);
+  // }
+
+  // @Get(':checkoutId')
+  // getOrderByCheckoutId(@Param('checkoutId') checkoutId: string) {
+  //   return this.cartService.getOrderByCheckoutId(checkoutId);
+  // }
+
+  @Post()
+  async createCart(@Body() dto: CartDto) {
+    return this.cartService.createCart(dto);
   }
 
-  @Post('checkout')
-  async createCheckout(
-    @Body() body: { amount: number; items: any[]; userId?: number },
-  ) {
-    return this.cartService.createCheckout(
-      body.amount,
-      body.items,
-      body.userId,
-    );
-  }
+  // @Post('checkout')
+  // async createCheckout(
+  //   @Body() body: { amount: number; items: any[]; userId?: number },
+  // ) {
+  //   return this.cartService.createCheckout(
+  //     body.amount,
+  //     body.items,
+  //     body.userId,
+  //   );
+  // }
 
-  @Post('webhook')
-  @HttpCode(200)
-  async handleWebhook(
-    @Headers('signature') signature: string,
-    @Req() req: RawBodyRequest<Request>,
-  ) {
-    if (!req.rawBody) {
-      throw new BadRequestException('Missing raw body');
-    }
-    return this.cartService.handleWebhook(signature, req.rawBody);
-  }
+  // @Post('webhook')
+  // @HttpCode(200)
+  // async handleWebhook(
+  //   @Headers('signature') signature: string,
+  //   @Req() req: RawBodyRequest<Request>,
+  // ) {
+  //   if (!req.rawBody) {
+  //     throw new BadRequestException('Missing raw body');
+  //   }
+  //   return this.cartService.handleWebhook(signature, req.rawBody);
+  // }
 }

@@ -38,14 +38,15 @@ export interface RamSpecs {
 
 export interface PsuSpecs {
   wattage: number;
-  efficiency: string; // gold/bronze...
-  //size should be linked with motherboard form factor?
+  efficiency: string;  // 80+ tier: Titanium / Platinum / Gold / Silver / Bronze / White
+  formFactor?: string; // ATX (default) | SFX | SFX-L | TFX | FlexATX
 }
 
 export interface CaseSpecs {
-  maxGpuLength: number; // mm
-  supportedFormFactors: string[]; // case size atx/mini-atx
-  maxCpuCoolerHeight?: number; // mm
+  maxGpuLength: number;            // mm
+  supportedFormFactors: string[];  // MB form factors: ATX / Micro-ATX / Mini-ITX
+  maxCpuCoolerHeight?: number;     // mm
+  supportedPsuTypes?: string[];    // PSU form factors: ATX / SFX / SFX-L / TFX / FlexATX
 }
 
 export interface CoolerSpecs {

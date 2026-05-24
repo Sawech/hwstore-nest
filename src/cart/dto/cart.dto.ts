@@ -1,5 +1,6 @@
 import { Type } from 'class-transformer';
 import {
+  IsArray,
   IsEnum,
   IsInt,
   IsNotEmpty,
@@ -9,6 +10,31 @@ import {
   Max,
   Min,
 } from 'class-validator';
+
+export class Item {
+  @IsNumber()
+  composantId: number;
+
+  @IsNumber()
+  @Min(1)
+  quantity: number;
+
+  @IsNumber()
+  @Min(0)
+  unitPrice: number;
+}
+
+export class CartDto {
+  @IsInt()
+  userId: number;
+
+  @IsArray()
+  items: Item[];
+
+  @IsNumber()
+  @Min(0)
+  totalPrice: number;
+}
 
 export class AdminCartDto {
   @IsOptional()

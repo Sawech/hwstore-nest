@@ -22,8 +22,8 @@ export class Cart {
   @JoinColumn({ name: 'user_id' })
   user?: User;
 
-  @Column({ nullable: true, name: 'session_token', length: 128 })
-  sessionToken?: string;
+  // @Column({ nullable: true, name: 'session_token', length: 128 })
+  // sessionToken?: string;
   @Column({ nullable: true, unique: true, name: 'order_ref', length: 20 })
   orderRef?: string;
 
@@ -39,6 +39,9 @@ export class Cart {
     eager: true,
   })
   items: CartItem[];
+
+  @Column('decimal', { precision: 14, scale: 2, name: 'total_price' })
+  totalPrice: number;
 
   @CreateDateColumn()
   createdAt: Date;

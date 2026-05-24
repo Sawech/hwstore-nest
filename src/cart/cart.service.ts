@@ -3,6 +3,8 @@ import {
   BadRequestException,
   ForbiddenException,
   NotFoundException,
+  HttpStatus,
+  HttpException,
 } from '@nestjs/common';
 import * as crypto from 'crypto';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -11,6 +13,8 @@ import { Cart } from './cart.entity';
 import {
   AdminCartDto,
   CartContextDto,
+  CartDto,
+  Item,
   UpdateCartStatusDto,
 } from './dto/cart.dto';
 import { CartStatus } from './cart.entity';
@@ -50,6 +54,40 @@ export class CartService {
     }
 
     return carts;
+  }
+
+  async findOne(id: number) {
+    const cart = await this.cartRepo.findOne({
+      where: { id },
+      relations: ['items', 'items.composant'],
+    });
+
+    if (!cart) {
+      throw new HttpException('Not Found', HttpStatus.NOT_FOUND);
+    }
+
+    return cart;
+  }
+
+  async createCart(dto: CartDto) {
+    const items = dto.items;
+    const userId = dto.userId;
+    const count = await this.cartRepo.count();
+    const year = new Date().getFullYear().toString().slice(-2);
+    const orderRef = `HW-${year}-${String(count + 1).padStart(5, '0')}`;
+    const cart = this.cartRepo.create({
+      status: 'active',
+      orderRef,
+      totalPrice: dto.totalPrice,
+      user: { id: userId },
+      items: items.map((i: Item) => ({
+        composant: { id: i.composantId },
+        quantity: i.quantity,
+        unitPrice: i.unitPrice,
+      })),
+    });
+
+    return this.cartRepo.save(cart);
   }
 
   async adminFindAll(query: AdminCartDto) {
@@ -147,81 +185,81 @@ export class CartService {
   //   return { merged: true, cartId: userCart.id };
   // }
 
-  async createCheckout(amount: number, items: any[], userId?: number) {
-    const response = await fetch(`${this.apiUrl}/checkouts`, {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${this.apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        amount,
-        currency: 'dzd',
-        success_url: 'http://localhost:4200/success',
-        failure_url: 'http://localhost:4200/panier',
-        metadata: { items, userId: userId ?? null },
-      }),
-    });
-    const data = await response.json();
-    return { checkout_url: data.checkout_url };
-  }
+  // async createCheckout(amount: number, items: any[], userId?: number) {
+  //   const response = await fetch(`${this.apiUrl}/checkouts`, {
+  //     method: 'POST',
+  //     headers: {
+  //       Authorization: `Bearer ${this.apiKey}`,
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       amount,
+  //       currency: 'dzd',
+  //       success_url: 'http://localhost:4200/success',
+  //       failure_url: 'http://localhost:4200/panier',
+  //       metadata: { items, userId: userId ?? null },
+  //     }),
+  //   });
+  //   const data = await response.json();
+  //   return { checkout_url: data.checkout_url };
+  // }
 
-  async handleWebhook(signature: string, rawBody: Buffer) {
-    if (!signature) throw new BadRequestException('Missing signature');
+  // async handleWebhook(signature: string, rawBody: Buffer) {
+  //   if (!signature) throw new BadRequestException('Missing signature');
 
-    const computed = crypto
-      .createHmac('sha256', this.apiKey)
-      .update(rawBody)
-      .digest('hex');
+  //   const computed = crypto
+  //     .createHmac('sha256', this.apiKey)
+  //     .update(rawBody)
+  //     .digest('hex');
 
-    if (
-      !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(computed))
-    ) {
-      throw new ForbiddenException('Invalid signature');
-    }
+  //   if (
+  //     !crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(computed))
+  //   ) {
+  //     throw new ForbiddenException('Invalid signature');
+  //   }
 
-    const event = JSON.parse(rawBody.toString());
+  //   const event = JSON.parse(rawBody.toString());
 
-    if (event.type === 'checkout.paid') {
-      const checkout = event.data;
-      const items = checkout.metadata?.items ?? [];
-      const userId = checkout.metadata?.userId ?? null;
-      const count = await this.cartRepo.count();
-      const year = new Date().getFullYear().toString().slice(-2);
-      const orderRef = `HW-${year}-${String(count + 1).padStart(5, '0')}`;
-      const cart = this.cartRepo.create({
-        status: 'active',
-        sessionToken: checkout.id,
-        orderRef,
-        ...(userId ? { user: { id: userId } } : {}),
-        items: items.map((i: any) => ({
-          composant: { id: i.composantId },
-          quantity: i.quantity,
-          unitPrice: i.unitPrice,
-        })),
-      });
+  //   if (event.type === 'checkout.paid') {
+  //     const checkout = event.data;
+  //     const items = checkout.metadata?.items ?? [];
+  //     const userId = checkout.metadata?.userId ?? null;
+  //     const count = await this.cartRepo.count();
+  //     const year = new Date().getFullYear().toString().slice(-2);
+  //     const orderRef = `HW-${year}-${String(count + 1).padStart(5, '0')}`;
+  //     const cart = this.cartRepo.create({
+  //       status: 'active',
+  //       sessionToken: checkout.id,
+  //       orderRef,
+  //       ...(userId ? { user: { id: userId } } : {}),
+  //       items: items.map((i: any) => ({
+  //         composant: { id: i.composantId },
+  //         quantity: i.quantity,
+  //         unitPrice: i.unitPrice,
+  //       })),
+  //     });
 
-      await this.cartRepo.save(cart);
-    } else if (event.type === 'checkout.failed') {
-    }
+  //     await this.cartRepo.save(cart);
+  //   } else if (event.type === 'checkout.failed') {
+  //   }
 
-    return { received: true };
-  }
+  //   return { received: true };
+  // }
 
-  async getBill(checkoutId: string) {
-    const response = await fetch(
-      `https://pay.chargily.net/test/api/v2/payment-links/${checkoutId}`,
+  // async getBill(checkoutId: string) {
+  //   const response = await fetch(
+  //     `https://pay.chargily.net/test/api/v2/payment-links/${checkoutId}`,
 
-      {
-        method: 'GET',
-        headers: {
-          Authorization: `Bearer ${this.apiKey}`,
-          'Content-Type': 'application/json',
-        },
-      },
-    );
-    return response.json();
-  }
+  //     {
+  //       method: 'GET',
+  //       headers: {
+  //         Authorization: `Bearer ${this.apiKey}`,
+  //         'Content-Type': 'application/json',
+  //       },
+  //     },
+  //   );
+  //   return response.json();
+  // }
 
   async getUserCarts(userId: number, page: number, limit: number) {
     const skip = (page - 1) * limit;
@@ -241,11 +279,11 @@ export class CartService {
     };
   }
 
-  async getOrderByCheckoutId(checkoutId: string) {
-    const cart = await this.cartRepo.findOne({
-      where: { sessionToken: checkoutId },
-    });
-    if (!cart) return null;
-    return cart;
-  }
+  // async getOrderByCheckoutId(checkoutId: string) {
+  //   const cart = await this.cartRepo.findOne({
+  //     where: { sessionToken: checkoutId },
+  //   });
+  //   if (!cart) return null;
+  //   return cart;
+  // }
 }

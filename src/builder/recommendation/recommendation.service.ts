@@ -70,8 +70,9 @@ export class RecommendationService {
         Math.round(Object.values(breakdown).reduce((a, b) => a + (b ?? 0), 0)),
       );
 
-      // Blend: 60% compatibility, 40% recommendation quality
-      const overall = Math.round(compatResult.score * 0.6 + recScore * 0.4);
+      // Blend: 50% compatibility score + 50% recommendation quality
+      // Scorers v2 are calibrated to 100-pt scale → 50/50 gives realistic 90–98% for perfect matches
+      const overall = Math.round(compatResult.score * 0.5 + recScore * 0.5);
 
       scored.push({
         composant: candidate,

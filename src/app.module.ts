@@ -30,21 +30,18 @@ import { DashboardModule } from './dashboard/dashboard.module';
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
         type: 'postgres',
-        host: config.get<string>('DB_HOST', 'localhost'),
-        port: config.get<number>('DB_PORT', 5432),
-        username: config.get<string>('DB_USERNAME', 'postgres'),
-        password: config.get<string>('DB_PASSWORD', 'postgres'),
-        database: config.get<string>('DB_DATABASE', 'hwstore'),
-        entities: [
-          Cart,
-          CartItem,
-          Composant,
-          Category,
-          SubCategory,
-          User,
-        ],
+        host: process.env.DB_HOST,
+        port: +process.env.DB_PORT!,
+        username: process.env.DB_USERNAME,
+        password: process.env.DB_PASSWORD,
+        database: process.env.DB_DATABASE,
+        entities: [Cart, CartItem, Composant, Category, SubCategory, User],
         synchronize: config.get<boolean>('DB_SYNCHRONIZE', true),
         logging: config.get<boolean>('DB_LOGGING', true),
+        ssl:
+          config.get<string>('DB_SSL') === 'true'
+            ? { rejectUnauthorized: false }
+            : false,
         retryAttempts: 5,
         retryDelay: 3000,
       }),
